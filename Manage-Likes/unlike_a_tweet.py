@@ -19,6 +19,8 @@ user_id = 'your-user-id'
 sleep_time_second = 20 # Rate Limit for Deleting Likes = 50 Requests per 15 Minutes Window
 delete_tweet_first_index = 0
 max_search_tweet = 1000
+min_tweet_id = 0
+max_tweet_id = 2000000000000000000
 regex_str = 'your-string-to-undo-like-by-regex'
 regex_flags = re.I|re.M
 json_file = open('like.json', 'r')
@@ -76,13 +78,15 @@ for i in range(delete_tweet_first_index, delete_tweet_first_index + max_search_t
     if i >= len(json_data):
         print("No Likes Anymore!")
         sys.exit()
-    tweet_id = json_data[i]['like']['tweetId']
+    tweet_id = int(json_data[i]['like']['tweetId'])
+    if tweet_id < min_tweet_id or tweet_id > max_tweet_id:
+        continue
     like_text = repr(json_data[i]['like']['fullText']) # Make Raw String like r'string'
     if re.search(regex_str, like_text, regex_flags) == None:
         continue
     print("--------------------------------")
     print("Index: " + str(i))
-    print("Tweet ID: " + tweet_id)
+    print("Tweet ID: " + str(tweet_id))
     print("Full Text: " + like_text)
     print("Waiting for " + str(sleep_time_second) + " Seconds...")
     time.sleep(sleep_time_second)
